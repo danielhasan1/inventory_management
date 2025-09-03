@@ -1,10 +1,8 @@
 # import argparse
 import sys
 
-
 from factory import WarehouseFactory
-
-
+from db import create_tables, init_db
 
 COMMANDS = {
     ("LOCATION", "REGISTER"): WarehouseFactory.get_location_service().register_location,
@@ -13,6 +11,7 @@ COMMANDS = {
     ("INVENTORY", "DECREMENT"): WarehouseFactory.get_inventory_service().decrement_inventory,
     ("INVENTORY", "TRANSFER"): WarehouseFactory.get_inventory_service().transfer_inventory,
     ("INVENTORY", "OBSERVE"): WarehouseFactory.get_inventory_service().observer_inventory,
+    ("EXIT",): sys.exit,
 }
 
 
@@ -20,7 +19,9 @@ def main():
     # parser = argparse.ArgumentParser()
     # parser.add_argument("--db", default="warehouse.db", help="Path to database file")
     # args = parser.parse_args()
-
+    # setup db
+    init_db()
+    create_tables()
     for line in sys.stdin:
         line = line.strip()
         if not line:

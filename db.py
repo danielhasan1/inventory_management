@@ -5,13 +5,19 @@ import os
 path = os.path.dirname(os.path.abspath(__file__))
 db_file = "warehouse.db"
 db_path = os.path.join(path, db_file)
+
+def init_db():
+    conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA foreign_keys=ON;")
+    conn.commit()
+    conn.close()
+
 @contextmanager
 def get_db():
     conn = sqlite3.connect(db_path, timeout=5, isolation_level=None, autocommit=False)
-    cursor = conn.cursor()
     try:
-        cursor.execute("PRAGMA journal_mode=WAL;")
-        cursor.execute("PRAGMA busy_timeout=3000;")
+        cursor = conn.cursor()
         yield cursor
     except Exception:
         conn.rollback()  # Add rollback on error
@@ -43,7 +49,4 @@ def create_tables():
         location_id VARCHAR(64) NOT NULL,
         FOREIGN KEY(location_id) REFERENCES locations(id));
         ''')
-
-
-create_tables()
 
